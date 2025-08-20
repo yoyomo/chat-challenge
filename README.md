@@ -120,7 +120,7 @@ Windows/Linux).
 
 List existing conversations:
 ```bash
-e$ go run ./cmd/cli list
+$ go run ./cmd/cli list
 ID                         TITLE
 68a5aa7b14ba62ef8448c917   Today's date
 68a5aa5714ba62ef8448c912   Weather in Barcelona
