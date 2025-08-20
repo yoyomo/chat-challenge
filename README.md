@@ -1,6 +1,6 @@
 # Acai Technical Challenge
 
-This technical challenge is part of the interview process for a Software Engineering position at [Acai Travel](https://acaitravel.com). 
+This technical challenge is part of the interview process for a Software Engineer position at [Acai Travel](https://acaitravel.com). 
 If you weren't sent here by one of our engineers, you can [get started here](https://www.acaitravel.com/about/careers).
 
 We know you're eager to get to the code, but please read the instructions carefully before you begin.
@@ -30,7 +30,8 @@ Currently, the assistant can:
 
 ## About the codebase
 
-We expect you to be able to navigate and figure out the codebase on your own, but here are some key takeaways to give you a boost:
+We expect you to be able to navigate and figure out the codebase on your own, but here are some key takeaways to give 
+you a boost:
 
 - There is a `Makefile` with a few handy commands like `make up` and `make run`.
 - The application uses [Twirp](https://twitchtv.github.io/twirp/docs/intro.html) as a framework for the API. You don't 
@@ -69,7 +70,7 @@ You'll need:
 Set up a repository:
 1. Create a new repository in your GitHub account. Clone this repository, then copy everything except the `.git` folder 
    into your own repo.
-2. Commit the changes as **“Initial commit”** to set your starting point.
+2. Commit the changes as **"Initial commit"** to set your starting point.
 
 Start the application:
 1. Set your OpenAI API key in the environment variable `OPENAI_API_KEY`.
@@ -93,7 +94,8 @@ etc.) or use the CLI tool provided in this repository.
 
 ### CLI tool
 
-There is a cli tool in `cmd/cli` to interact with the application. You can build this tool using `go build` or use `go run` to run it directly.
+There is a cli tool in `cmd/cli` to interact with the application. You can build this tool using `go build` or use 
+`go run` to run it directly.
 
 Available commands:
 -  **ask** - Create a new conversation with assistant or continue an existing one
@@ -111,7 +113,8 @@ USER:
 <type your message here>
 ```
 
-Wait for the assistant to respond, ask more questions, or exit the conversation by pressing `CMD+C` (or `CTRL+C` on Windows/Linux).
+Wait for the assistant to respond, ask more questions, or exit the conversation by pressing `CMD+C` (or `CTRL+C` on 
+Windows/Linux).
 
 List existing conversations:
 ```bash
@@ -157,20 +160,32 @@ Type your message to continue the conversation.
 
 ### HTTP API
 
-We have created a [postman collection](https://documenter.getpostman.com/view/40257649/2sB3BKFo8S) for you to explore the API. You can use [postman](https://www.postman.com/) or any other HTTP client.
+We have created a [postman collection](https://documenter.getpostman.com/view/40257649/2sB3BKFo8S) for you to explore 
+the API. You can use [postman](https://www.postman.com/) or any other HTTP client.
+
+## Testing
+
+The codebase includes tests for the server and the assistant. The tests require mongoDB to be running, so make sure
+to start it with `make up` before running the tests.
+
+Run the tests using:
+```bash
+go test ./...
+```
+
 
 ## Tasks
 
 ### Task 1: Fix conversation title
 
-If you start a conversation, you'll notice the title doesn't really reflect the topic.  
-Instead of summarizing your question, it tries to answer it.
+If you start a conversation, you'll notice the title doesn't really reflect the topic. Instead of summarizing your 
+question, it tries to answer it.
 
-Your task is to fix the title generation logic so it summarizes the question instead of answering it.  
-The system should generate a concise title that reflects the main topic of the conversation.
+Your task is to fix the title generation logic so it summarizes the question instead of answering it. The system should 
+generate a concise title that reflects the main topic of the conversation.
 
-For example:  
-If you ask *“What is the weather like in Barcelona?”*, the title should be something like *“Weather in Barcelona”*.
+For example, if you ask *"What is the weather like in Barcelona?"*, the title should be something like *"Weather in 
+Barcelona"*.
 
 **Bonus:** Optimize performance for the `StartConversation` API to make it faster.
 
@@ -178,8 +193,7 @@ If you ask *“What is the weather like in Barcelona?”*, the title should be s
 
 ### Task 2: Fix the weather
 
-The assistant is supposed to provide weather information, but currently it just says *“the weather is fine.”*  
-You need to connect it to a real weather API and return actual weather information (temperature, wind speed, conditions, etc.).
+The assistant is supposed to provide weather information, but currently it just says *"the weather is fine."* You need to connect it to a real weather API and return actual weather information (temperature, wind speed, conditions, etc.).
 
 You can use any public weather API, e.g. [WeatherAPI](https://www.weatherapi.com/).
 
@@ -189,8 +203,7 @@ You can use any public weather API, e.g. [WeatherAPI](https://www.weatherapi.com
 
 ### Task 3: Refactor tools
 
-The team is concerned that the way tools are currently defined in the codebase makes them difficult to maintain and extend.  
-We're planning to add many more tools to give the assistant more capabilities, so we need a robust way to define and implement tools.
+The team is concerned that the way tools are currently defined in the codebase makes them difficult to maintain and extend. We're planning to add many more tools to give the assistant more capabilities, so we need a robust way to define and implement tools.
 
 Refactor `internal/assistant/assistant.go` to make working with tools easier. Feel free to split things into files, introduce new package(s), or reorganize code as you see fit.
 
@@ -198,8 +211,7 @@ Refactor `internal/assistant/assistant.go` to make working with tools easier. Fe
 
 ### Task 4: Instrument web server
 
-The team wants better visibility into the performance of the web server.  
-Add some basic metrics to track the number of requests, response times, and error rates.
+The team wants better visibility into the performance of the web server. Add some basic metrics to track the number of requests, response times, and error rates.
 
 Use [OpenTelemetry](https://opentelemetry.io/docs/languages/go/instrumentation/#metrics) to capture metrics for the number of requests and response times.
 
