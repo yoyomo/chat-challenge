@@ -208,6 +208,8 @@ The team is concerned that the way tools are currently defined in the codebase m
 
 Refactor `internal/assistant/assistant.go` to make working with tools easier. Feel free to split things into files, introduce new package(s), or reorganize code as you see fit.
 
+**Bonus:** Create a new tool of your choice.
+
 ---
 
 ### Task 4: Instrument web server
@@ -218,6 +220,8 @@ Use [OpenTelemetry](https://opentelemetry.io/docs/languages/go/instrumentation/#
 
 Keep the exporter and provider configuration simple—the key part is how you capture and configure specific metrics.
 
+**Bonus:** Add tracing to the web server to track request flow through the application.
+
 ---
 
 ### Task 5: Create a test for StartConversation API
@@ -227,3 +231,5 @@ The team wants a test for the `StartConversation` API to ensure it works as expe
 - Creates new conversations.
 - Populates the title.
 - Triggers the assistant's response.
+  
+**Bonus:** Add tests for assistant's `Title` method in `internal/assistant/assistant.go`.
