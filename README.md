@@ -50,14 +50,16 @@ you a boost:
    each other's solutions. Keep your repository **public** so we can see your solution.
 2. **Make use of git history.** It's easier for us to review your code if you commit your changes in meaningful chunks 
    with clear descriptions.
-3. **Follow Go conventions.** Use the tools shipped with the Go compiler, such as `go fmt`, `go test`, etc. Avoid 
+3. **Use standard Go tools.** Use the tools shipped with the Go compiler, such as `go fmt`, `go test`, etc. Avoid 
    unnecessary dependencies or tools—keep it simple.
-4. **Leave comments** where it makes sense. It helps whoever reads the code after you.
-5. **Use best practices™**, whatever that means to you.
-6. **Use the CLI tool** to interact with the application. You can use [Postman](https://www.postman.com/), curl, or any 
+4. **Use Go conventions.** Follow Go conventions for naming, formatting, and structuring your code. Check the 
+   [Effective Go](https://go.dev/doc/effective_go) and [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments).
+5. **Leave comments** where it makes sense. It helps whoever reads the code after you.
+6. **Use best practices™**, whatever that means to you.
+7. **Use the CLI tool** to interact with the application. You can use [Postman](https://www.postman.com/), curl, or any 
    other HTTP client to call the API directly, but for convenience there's a CLI tool in `cmd/cli` to interact with the 
    application. See the instructions below on how to use it.
-7. **You may use AI assistance/co-pilots**, but remember we are looking for a meaningful and maintainable codebase, not 
+8. **You may use AI assistance/co-pilots**, but remember we are looking for a meaningful and maintainable codebase, not 
    something slapped together quickly.
 
 ## Setting things up
