@@ -157,7 +157,7 @@ Type your message to continue the conversation.
 
 ### HTTP API
 
-We have created a [postman collection]() for you to explore the API. You can use [postman](https://www.postman.com/) or any other HTTP client.
+We have created a [postman collection](https://documenter.getpostman.com/view/40257649/2sB3BKFo8S) for you to explore the API. You can use [postman](https://www.postman.com/) or any other HTTP client.
 
 ## Tasks
 
