@@ -195,7 +195,8 @@ Barcelona"*.
 
 The assistant is supposed to provide weather information, but currently it just says *"the weather is fine."* You need to connect it to a real weather API and return actual weather information (temperature, wind speed, conditions, etc.).
 
-You can use any public weather API, e.g. [WeatherAPI](https://www.weatherapi.com/).
+You can use any public weather API, e.g. [WeatherAPI](https://www.weatherapi.com/). This particular API is free to use, 
+but you need to sign up and get an API key.
 
 **Bonus:** Enable the assistant to provide forecast information as well as current weather.
 
@@ -221,8 +222,7 @@ Keep the exporter and provider configuration simple—the key part is how you ca
 
 ### Task 5: Create a test for StartConversation API
 
-The team wants a test for the `StartConversation` API to ensure it works as expected.  
-Create an automated test in `internal/chat/server_test.go` to ensure the API:
+The team wants a test for the `StartConversation` API to ensure it works as expected. Create an automated test in `internal/chat/server_test.go` to ensure the API:
 
 - Creates new conversations.
 - Populates the title.
