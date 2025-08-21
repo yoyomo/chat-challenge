@@ -11,7 +11,7 @@ In this challenge, you'll work on an existing application from this repository, 
 make changes, add features, refactor existing code, etc. Think of it as if you've just joined a team and received a task 
 to improve an existing codebase.
 
-You will be given a few specific tasks to complete, but feel free to do some housekeeping if you see something that 
+You will be given a few specific [tasks to complete](#Tasks), but feel free to do some housekeeping if you see something that 
 could be improved.
 
 The application is a personal assistant service, which provides an API for conversations with an AI assistant. You could 
@@ -55,11 +55,7 @@ you a boost:
 4. **Use Go conventions.** Follow Go conventions for naming, formatting, and structuring your code. Check the 
    [Effective Go](https://go.dev/doc/effective_go) and [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments).
 5. **Leave comments** where it makes sense. It helps whoever reads the code after you.
-6. **Use best practices™**, whatever that means to you.
-7. **Use the CLI tool** to interact with the application. You can use [Postman](https://www.postman.com/), curl, or any 
-   other HTTP client to call the API directly, but for convenience there's a CLI tool in `cmd/cli` to interact with the 
-   application. See the instructions below on how to use it.
-8. **You may use AI assistance/co-pilots**, but remember we are looking for a meaningful and maintainable codebase, not 
+6. **You may use AI assistance/co-pilots**, but remember we are looking for a meaningful and maintainable codebase, not 
    something slapped together quickly.
 
 ## Setting things up
@@ -87,78 +83,16 @@ Start the application:
 4. Use `command+C` to stop the server when you're done.
 5. Use `make down` to stop the MongoDB container.
 
-
 ## Usage
 
-Before you interact with the application, make sure it's running, follow steps in the **Setting things up** section.
-The application provides a simple HTTP based API, you can interact with it using any HTTP client (like Postman, curl, 
-etc.) or use the CLI tool provided in this repository.
+> Before you interact with the application, make sure it's running, follow steps in the **Setting things up** section.
+
+The application provides a simple HTTP-based API, you can interact with it using any HTTP client (like Postman, curl, 
+etc.) or use the [CLI tool](cmd/cli/README.md) provided in this repository.
 
 ### CLI tool
 
-There is a cli tool in `cmd/cli` to interact with the application. You can build this tool using `go build` or use 
-`go run` to run it directly.
-
-Available commands:
--  **ask** - Create a new conversation with assistant or continue an existing one
--  **list** - List existing conversations
--  **show** - Show conversation by ID
-
-Start a conversation:
-```bash
-$ go run ./cmd/cli ask
-Press CMD+C to exit.
-
-Starting a new conversation, type your message below.
-
-USER:
-<type your message here>
-```
-
-Wait for the assistant to respond, ask more questions, or exit the conversation by pressing `CMD+C` (or `CTRL+C` on 
-Windows/Linux).
-
-List existing conversations:
-```bash
-$ go run ./cmd/cli list
-ID                         TITLE
-68a5aa7b14ba62ef8448c917   Today's date
-68a5aa5714ba62ef8448c912   Weather in Barcelona
-```
-
-View a conversation by ID:
-```bash
-$ go run ./cmd/cli show 68a5aa7b14ba62ef8448c917
-ID: 68a5aa7b14ba62ef8448c917
-Title: Today's date
-Timestamp: Wed, 20 Aug 2025 10:59:07 UTC
-
-USER, 10:59:07:
-What day is today?
-
-ASSISTANT, 10:59:13:
-Today is August 20, 2025.
-```
-
-Continue a conversation by ID:
-```bash
-$ go run ./cmd/cli ask 68a5aa7b14ba62ef8448c917 
-Press CMD+C to exit.
-
-ID: 68a5aa7b14ba62ef8448c917
-Title: Today's date
-Timestamp: Wed, 20 Aug 2025 10:59:07 UTC
-
-USER, 10:59:07:
-What day is today?
-
-ASSISTANT, 10:59:13:
-Today is August 20, 2025.
-
-USER:
-```
-
-Type your message to continue the conversation.
+You can find [CLI tool](cmd/cli/README.md) in `cmd/cli` to interact with the application.
 
 ### HTTP API
 
@@ -175,8 +109,12 @@ Run the tests using:
 go test ./...
 ```
 
-
 ## Tasks
+
+**You can complete as many tasks as you like**, you can skip tasks that do not appeal to you.
+The more tasks you complete, the better we can assess your skills.
+
+We would like you to spend at least 1 hour on the challenge.
 
 ### Task 1: Fix conversation title
 
@@ -214,19 +152,7 @@ Refactor `internal/assistant/assistant.go` to make working with tools easier. Fe
 
 ---
 
-### Task 4: Instrument web server
-
-The team wants better visibility into the performance of the web server. Add some basic metrics to track the number of requests, response times, and error rates.
-
-Use [OpenTelemetry](https://opentelemetry.io/docs/languages/go/instrumentation/#metrics) to capture metrics for the number of requests and response times.
-
-Keep the exporter and provider configuration simple—the key part is how you capture and configure specific metrics.
-
-**Bonus:** Add tracing to the web server to track request flow through the application.
-
----
-
-### Task 5: Create a test for StartConversation API
+### Task 4: Create a test for StartConversation API
 
 The team wants a test for the `StartConversation` API to ensure it works as expected. Create an automated test in `internal/chat/server_test.go` to ensure the API:
 
@@ -235,3 +161,15 @@ The team wants a test for the `StartConversation` API to ensure it works as expe
 - Triggers the assistant's response.
   
 **Bonus:** Add tests for assistant's `Title` method in `internal/assistant/assistant.go`.
+
+---
+
+### Task 5: Instrument web server
+
+The team wants better visibility into the performance of the web server. Add some basic metrics to track the number of requests, response times, and error rates.
+
+Use [OpenTelemetry](https://opentelemetry.io/docs/languages/go/instrumentation/#metrics) to capture metrics for the number of requests and response times.
+
+Keep the exporter and provider configuration simple—the key part is how you capture and configure specific metrics.
+
+**Bonus:** Add tracing to the web server to track request flow through the application.
