@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func MustConnect(ctx context.Context) *mongo.Database {
+func MustConnect() *mongo.Database {
 	uri := os.Getenv("MONGODB_URI")
 	if uri == "" {
 		uri = "mongodb://acai:travel@localhost:27017"
@@ -19,7 +19,7 @@ func MustConnect(ctx context.Context) *mongo.Database {
 		dbname = "acai"
 	}
 
-	client, err := mongo.Connect(ctx, options.Client().
+	client, err := mongo.Connect(context.Background(), options.Client().
 		ApplyURI(uri).
 		SetServerAPIOptions(options.ServerAPI(options.ServerAPIVersion1)).
 		SetBSONOptions(&options.BSONOptions{NilSliceAsEmpty: true}))

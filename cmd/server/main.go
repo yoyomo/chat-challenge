@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -17,9 +16,7 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-
-	mongo := mongox.MustConnect(ctx)
+	mongo := mongox.MustConnect()
 
 	repo := model.New(mongo)
 	assist := assistant.New()
