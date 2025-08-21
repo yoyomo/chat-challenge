@@ -5,6 +5,9 @@ If you weren't sent here by one of our engineers, you can [get started here](htt
 
 We know you're eager to get to the code, but please read the instructions carefully before you begin.
 
+The challenge might seem tricky at first, but once you get into it, we hopy you'll enjoy the process and have fun 
+working with AI and Go.
+
 ## Introduction
 
 In this challenge, you'll work on an existing application from this repository, written in [Go](https://go.dev). You can 
@@ -118,7 +121,9 @@ We would like you to spend at least 1 hour on the challenge.
 
 ### Task 1: Fix conversation title
 
-If you start a conversation, you'll notice the title doesn't really reflect the topic. Instead of summarizing your 
+> We recommend starting with this one. This task is relatively easy and requires you to debug the application, allowing you to get familiar with the codebase, and understand how the application works.
+
+If you start a conversation, you'll notice the title does not really reflect the topic. Instead of summarizing your 
 question, it tries to answer it.
 
 Your task is to fix the title generation logic so it summarizes the question instead of answering it. The system should 
