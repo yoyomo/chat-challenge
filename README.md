@@ -37,14 +37,14 @@ We expect you to be able to navigate and figure out the codebase on your own, bu
 you a boost:
 
 - There is a `Makefile` with a few handy commands like `make up` and `make run`.
-- The application uses [Twirp](https://twitchtv.github.io/twirp/docs/intro.html) as a framework for the API. You don't 
-  need to dig deep into Twirp, it's easy to use, provides JSON via HTTP endpoints, and defines an interface to implement 
-  the server part.
 - The entry point to the application is in `cmd/server/main.go`, but the main logic lives in `internal/chat/server.go`.
 - The application stores conversations in a [MongoDB](https://www.mongodb.com/) database. There's a docker compose file 
   to start a local MongoDB instance.
-- The project includes code generation for Twirp and protobuf, but you should be able to complete the challenge without 
-  needing to run or understand it. In any case, do **not** make manual changes to the `internal/pb` package.
+- The application uses [Twirp](https://twitchtv.github.io/twirp/docs/intro.html) and [protobuf](https://protobuf.dev/)
+  as a framework for the API. **You do NOT need to dig deep into Twirp and protobuf**. It's easy to use, provides JSON
+  via HTTP endpoints, and "automagically" wires HTTP handlers and server implementation.
+- The project uses code generation, but you should be able to complete the challenge without needing to run or 
+  understand it. In any case, do **not** make manual changes to the `internal/pb` package, maybe consider it a blackbox.
 
 ## General guidelines
 
@@ -54,7 +54,7 @@ you a boost:
 2. **Make use of git history.** It's easier for us to review your code if you commit your changes in meaningful chunks 
    with clear descriptions.
 3. **Use standard Go tools.** Use the tools shipped with the Go compiler, such as `go fmt`, `go test`, etc. Avoid 
-   unnecessary dependencies or tools—keep it simple.
+   unnecessary dependencies or tools. Keep it simple.
 4. **Use Go conventions.** Follow Go conventions for naming, formatting, and structuring your code. Check the 
    [Effective Go](https://go.dev/doc/effective_go) and [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments).
 5. **Leave comments** where it makes sense. It helps whoever reads the code after you.
