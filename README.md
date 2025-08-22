@@ -5,7 +5,7 @@ If you weren't sent here by one of our engineers, you can [get started here](htt
 
 We know you're eager to get to the code, but please read the instructions carefully before you begin.
 
-The challenge might seem tricky at first, but once you get into it, we hopy you'll enjoy the process and have fun 
+The challenge might seem tricky at first, but once you get into it, we hope you'll enjoy the process and have fun 
 working with AI and Go.
 
 ## Introduction
