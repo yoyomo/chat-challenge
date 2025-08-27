@@ -97,7 +97,12 @@ func (a *Assistant) Reply(ctx context.Context, conv *model.Conversation) (string
 						"type": "object",
 						"properties": map[string]any{
 							"location": map[string]string{
-								"type": "string",
+								"type":        "string",
+								"description": "The location to get the weather for",
+							},
+							"forecastDays": map[string]string{
+								"type":        "integer",
+								"description": "The number of days to include in the weather forecast",
 							},
 						},
 						"required": []string{"location"},
@@ -148,10 +153,10 @@ func (a *Assistant) Reply(ctx context.Context, conv *model.Conversation) (string
 				switch call.Function.Name {
 				case "get_weather":
 					if err := json.Unmarshal([]byte(call.Function.Arguments), &WeatherArgs); err != nil {
-						msgs = append(msgs, openai.ToolMessage("failed to parse location", call.ID))
+						msgs = append(msgs, openai.ToolMessage("failed to parse weather arguments", call.ID))
 						break
 					}
-					weather, err := getWeather(WeatherArgs.Location)
+					weather, err := getWeather(WeatherArgs.Location, WeatherArgs.ForecastDays)
 					if err != nil {
 						msgs = append(msgs, openai.ToolMessage("failed to get weather: "+err.Error(), call.ID))
 						break
@@ -220,12 +225,22 @@ func (a *Assistant) Reply(ctx context.Context, conv *model.Conversation) (string
 }
 
 var WeatherArgs struct {
-	Location string `json:"location"`
+	Location     string `json:"location"`
+	ForecastDays int    `json:"forecastDays"`
 }
 
-func getWeather(location string) (string, error) {
+func getWeather(location string, forecastDays int) (string, error) {
 	weatherAPIKey := os.Getenv("WEATHER_API_KEY")
-	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s", weatherAPIKey, location)
+	url := "https://api.weatherapi.com/v1/"
+	params := fmt.Sprintf("?key=%s&q=%s", weatherAPIKey, location)
+	var apiPath string
+	if forecastDays > 0 {
+		apiPath = "forecast.json"
+		params += fmt.Sprintf("&days=%d", forecastDays)
+	} else {
+		apiPath = "current.json"
+	}
+	url += apiPath + params
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
