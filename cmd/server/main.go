@@ -37,6 +37,7 @@ func main() {
 
 	handler.PathPrefix("/twirp/").Handler(pb.NewChatServiceServer(server, twirp.WithServerJSONSkipDefaults(true)))
 
+	// Load .env file
 	err := godotenv.Load()
 	if err != nil {
 		panic("Error loading .env file")

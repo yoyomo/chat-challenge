@@ -2,18 +2,12 @@ package assistant
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
 	"log/slog"
-	"net/http"
-	"os"
 	"strings"
-	"time"
 
 	"github.com/acai-travel/tech-challenge/internal/chat/model"
-	ics "github.com/arran4/golang-ical"
+	"github.com/acai-travel/tech-challenge/internal/chat/tools"
 	"github.com/openai/openai-go/v2"
 )
 
@@ -86,54 +80,18 @@ func (a *Assistant) Reply(ctx context.Context, conv *model.Conversation) (string
 	}
 
 	for i := 0; i < 15; i++ {
+		toolDefs := []openai.ChatCompletionToolUnionParam{}
+		for _, tool := range tools.Registry {
+			toolDefs = append(toolDefs, openai.ChatCompletionFunctionTool(openai.FunctionDefinitionParam{
+				Name:        tool.Name(),
+				Description: openai.String(tool.Description()),
+				Parameters:  tool.Parameters(),
+			}))
+		}
 		resp, err := a.cli.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
 			Model:    openai.ChatModelGPT4_1,
 			Messages: msgs,
-			Tools: []openai.ChatCompletionToolUnionParam{
-				openai.ChatCompletionFunctionTool(openai.FunctionDefinitionParam{
-					Name:        "get_weather",
-					Description: openai.String("Get weather at the given location"),
-					Parameters: openai.FunctionParameters{
-						"type": "object",
-						"properties": map[string]any{
-							"location": map[string]string{
-								"type":        "string",
-								"description": "The location to get the weather for",
-							},
-							"forecastDays": map[string]string{
-								"type":        "integer",
-								"description": "The number of days to include in the weather forecast",
-							},
-						},
-						"required": []string{"location"},
-					},
-				}),
-				openai.ChatCompletionFunctionTool(openai.FunctionDefinitionParam{
-					Name:        "get_today_date",
-					Description: openai.String("Get today's date and time in RFC3339 format"),
-				}),
-				openai.ChatCompletionFunctionTool(openai.FunctionDefinitionParam{
-					Name:        "get_holidays",
-					Description: openai.String("Gets local bank and public holidays. Each line is a single holiday in the format 'YYYY-MM-DD: Holiday Name'."),
-					Parameters: openai.FunctionParameters{
-						"type": "object",
-						"properties": map[string]any{
-							"before_date": map[string]string{
-								"type":        "string",
-								"description": "Optional date in RFC3339 format to get holidays before this date. If not provided, all holidays will be returned.",
-							},
-							"after_date": map[string]string{
-								"type":        "string",
-								"description": "Optional date in RFC3339 format to get holidays after this date. If not provided, all holidays will be returned.",
-							},
-							"max_count": map[string]string{
-								"type":        "integer",
-								"description": "Optional maximum number of holidays to return. If not provided, all holidays will be returned.",
-							},
-						},
-					},
-				}),
-			},
+			Tools:    toolDefs,
 		})
 
 		if err != nil {
@@ -149,70 +107,17 @@ func (a *Assistant) Reply(ctx context.Context, conv *model.Conversation) (string
 
 			for _, call := range message.ToolCalls {
 				slog.InfoContext(ctx, "Tool call received", "name", call.Function.Name, "args", call.Function.Arguments)
-
-				switch call.Function.Name {
-				case "get_weather":
-					if err := json.Unmarshal([]byte(call.Function.Arguments), &WeatherArgs); err != nil {
-						msgs = append(msgs, openai.ToolMessage("failed to parse weather arguments", call.ID))
-						break
-					}
-					weather, err := getWeather(WeatherArgs.Location, WeatherArgs.ForecastDays)
-					if err != nil {
-						msgs = append(msgs, openai.ToolMessage("failed to get weather: "+err.Error(), call.ID))
-						break
-					}
-					msgs = append(msgs, openai.ToolMessage(weather, call.ID))
-				case "get_today_date":
-					msgs = append(msgs, openai.ToolMessage(time.Now().Format(time.RFC3339), call.ID))
-				case "get_holidays":
-					link := "https://www.officeholidays.com/ics/spain/catalonia"
-					if v := os.Getenv("HOLIDAY_CALENDAR_LINK"); v != "" {
-						link = v
-					}
-
-					events, err := LoadCalendar(ctx, link)
-					if err != nil {
-						msgs = append(msgs, openai.ToolMessage("failed to load holiday events", call.ID))
-						break
-					}
-
-					var payload struct {
-						BeforeDate time.Time `json:"before_date,omitempty"`
-						AfterDate  time.Time `json:"after_date,omitempty"`
-						MaxCount   int       `json:"max_count,omitempty"`
-					}
-
-					if err := json.Unmarshal([]byte(call.Function.Arguments), &payload); err != nil {
-						msgs = append(msgs, openai.ToolMessage("failed to parse tool call arguments: "+err.Error(), call.ID))
-						break
-					}
-
-					var holidays []string
-					for _, event := range events {
-						date, err := event.GetAllDayStartAt()
-						if err != nil {
-							continue
-						}
-
-						if payload.MaxCount > 0 && len(holidays) >= payload.MaxCount {
-							break
-						}
-
-						if !payload.BeforeDate.IsZero() && date.After(payload.BeforeDate) {
-							continue
-						}
-
-						if !payload.AfterDate.IsZero() && date.Before(payload.AfterDate) {
-							continue
-						}
-
-						holidays = append(holidays, date.Format(time.DateOnly)+": "+event.GetProperty(ics.ComponentPropertySummary).Value)
-					}
-
-					msgs = append(msgs, openai.ToolMessage(strings.Join(holidays, "\n"), call.ID))
-				default:
+				tool, ok := tools.Registry[call.Function.Name]
+				if !ok {
 					return "", errors.New("unknown tool call: " + call.Function.Name)
 				}
+				result, err := tool.Handle(ctx, []byte(call.Function.Arguments))
+				if err != nil {
+					msgs = append(msgs, openai.ToolMessage(err.Error(), call.ID))
+					continue
+				}
+				msgs = append(msgs, openai.ToolMessage(result, call.ID))
+
 			}
 
 			continue
@@ -222,33 +127,4 @@ func (a *Assistant) Reply(ctx context.Context, conv *model.Conversation) (string
 	}
 
 	return "", errors.New("too many tool calls, unable to generate reply")
-}
-
-var WeatherArgs struct {
-	Location     string `json:"location"`
-	ForecastDays int    `json:"forecastDays"`
-}
-
-func getWeather(location string, forecastDays int) (string, error) {
-	weatherAPIKey := os.Getenv("WEATHER_API_KEY")
-	url := "https://api.weatherapi.com/v1/"
-	params := fmt.Sprintf("?key=%s&q=%s", weatherAPIKey, location)
-	var apiPath string
-	if forecastDays > 0 {
-		apiPath = "forecast.json"
-		params += fmt.Sprintf("&days=%d", forecastDays)
-	} else {
-		apiPath = "current.json"
-	}
-	url += apiPath + params
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	return string(body), nil
 }
