@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"log/slog"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -144,7 +147,16 @@ func (a *Assistant) Reply(ctx context.Context, conv *model.Conversation) (string
 
 				switch call.Function.Name {
 				case "get_weather":
-					msgs = append(msgs, openai.ToolMessage("weather is fine", call.ID))
+					if err := json.Unmarshal([]byte(call.Function.Arguments), &WeatherArgs); err != nil {
+						msgs = append(msgs, openai.ToolMessage("failed to parse location", call.ID))
+						break
+					}
+					weather, err := getWeather(WeatherArgs.Location)
+					if err != nil {
+						msgs = append(msgs, openai.ToolMessage("failed to get weather: "+err.Error(), call.ID))
+						break
+					}
+					msgs = append(msgs, openai.ToolMessage(weather, call.ID))
 				case "get_today_date":
 					msgs = append(msgs, openai.ToolMessage(time.Now().Format(time.RFC3339), call.ID))
 				case "get_holidays":
@@ -205,4 +217,23 @@ func (a *Assistant) Reply(ctx context.Context, conv *model.Conversation) (string
 	}
 
 	return "", errors.New("too many tool calls, unable to generate reply")
+}
+
+var WeatherArgs struct {
+	Location string `json:"location"`
+}
+
+func getWeather(location string) (string, error) {
+	weatherAPIKey := os.Getenv("WEATHER_API_KEY")
+	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s", weatherAPIKey, location)
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/acai-travel/tech-challenge/internal/mongox"
 	"github.com/acai-travel/tech-challenge/internal/pb"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/twitchtv/twirp"
 )
 
@@ -35,6 +36,11 @@ func main() {
 	})
 
 	handler.PathPrefix("/twirp/").Handler(pb.NewChatServiceServer(server, twirp.WithServerJSONSkipDefaults(true)))
+
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error loading .env file")
+	}
 
 	// Start the server
 	slog.Info("Starting the server...")
