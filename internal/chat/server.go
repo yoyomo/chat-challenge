@@ -29,22 +29,24 @@ func NewServer(repo *model.Repository, assist Assistant) *Server {
 }
 
 func (s *Server) StartConversation(ctx context.Context, req *pb.StartConversationRequest) (*pb.StartConversationResponse, error) {
+	if strings.TrimSpace(req.GetMessage()) == "" {
+		return nil, twirp.RequiredArgumentError("message")
+	}
+
+	questionTime := time.Now()
+
 	conversation := &model.Conversation{
 		ID:        primitive.NewObjectID(),
 		Title:     "Untitled conversation",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: questionTime,
+		UpdatedAt: questionTime,
 		Messages: []*model.Message{{
 			ID:        primitive.NewObjectID(),
 			Role:      model.RoleUser,
 			Content:   req.GetMessage(),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			CreatedAt: questionTime,
+			UpdatedAt: questionTime,
 		}},
-	}
-
-	if strings.TrimSpace(req.GetMessage()) == "" {
-		return nil, twirp.RequiredArgumentError("message")
 	}
 
 	// choose a title
@@ -58,18 +60,21 @@ func (s *Server) StartConversation(ctx context.Context, req *pb.StartConversatio
 	// generate a reply
 	reply, err := s.assist.Reply(ctx, conversation)
 	if err != nil {
+		slog.ErrorContext(ctx, "Failed to generate conversation reply", "error", err)
 		return nil, err
 	}
+	replyTime := time.Now()
 
 	conversation.Messages = append(conversation.Messages, &model.Message{
 		ID:        primitive.NewObjectID(),
 		Role:      model.RoleAssistant,
 		Content:   reply,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: replyTime,
+		UpdatedAt: replyTime,
 	})
 
 	if err := s.repo.CreateConversation(ctx, conversation); err != nil {
+		slog.ErrorContext(ctx, "Failed to create conversation", "error", err)
 		return nil, err
 	}
 
