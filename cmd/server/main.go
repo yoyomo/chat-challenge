@@ -14,6 +14,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/twitchtv/twirp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
+	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	"go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 func main() {
@@ -42,6 +47,15 @@ func main() {
 	if err != nil {
 		panic("Error loading .env file")
 	}
+
+	// Setup OpenTelemetry
+	metricExporter, _ := stdoutmetric.New()
+	meterProvider := metric.NewMeterProvider(metric.WithReader(metric.NewPeriodicReader(metricExporter)))
+	otel.SetMeterProvider(meterProvider)
+
+	traceExporter, _ := stdouttrace.New()
+	tracerProvider := trace.NewTracerProvider(trace.WithBatcher(traceExporter))
+	otel.SetTracerProvider(tracerProvider)
 
 	// Start the server
 	slog.Info("Starting the server...")
